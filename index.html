@@ -4,144 +4,120 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>壳里 Kelly - 随身的守护</title>
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="壳里">
-    <link rel="apple-touch-icon" href="https://bubbbbblehu-cell.github.io/safestay/icon.png?v=1">
     <style>
         :root { 
-            --bg-blue: #F0F7FF; 
-            --main-blue: #A3C9E2; 
-            --accent-blue: #5A9BD5; 
-            --glass-white: rgba(255, 255, 255, 0.8); 
-            --text-main: #4A5568; 
+            --bg-blue: #F0F7FF; --main-blue: #A3C9E2; --accent-blue: #5A9BD5; 
+            --glass-white: rgba(255, 255, 255, 0.85); --text-main: #4A5568; 
             --safe-bottom: env(safe-area-inset-bottom);
         }
         
         body, html { 
             margin: 0; padding: 0; height: 100%; width: 100%;
             background: linear-gradient(135deg, #F5F9FF 0%, #EBF4FF 100%); 
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
-            color: var(--text-main); 
-            -webkit-tap-highlight-color: transparent;
-            overflow: hidden;
+            font-family: -apple-system, system-ui, sans-serif; color: var(--text-main); 
+            -webkit-tap-highlight-color: transparent; overflow: hidden;
         }
 
-        /* 页面容器 - 适配长屏 */
         .page { 
-            display: none; 
-            padding: 20px 25px calc(20px + var(--safe-bottom)); 
-            box-sizing: border-box; 
-            height: 100vh; 
-            flex-direction: column;
+            display: none; padding: 20px 25px calc(25px + var(--safe-bottom)); 
+            box-sizing: border-box; height: 100vh; flex-direction: column;
             animation: fadeIn 0.4s ease;
         }
         .page.active { display: flex; }
-        
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 内容滚动区 */
         .scroll-content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 20px; }
 
         .glass-card { 
-            background: var(--glass-white); 
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); 
-            border: 1px solid rgba(255,255,255,0.5); 
-            padding: 18px; margin-bottom: 15px; 
+            background: var(--glass-white); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.5); padding: 18px; margin-bottom: 15px; 
             clip-path: polygon(0 0, 94% 0, 100% 6%, 100% 100%, 0 100%); 
-            box-shadow: 10px 10px 20px rgba(163, 201, 226, 0.15); 
-            transition: all 0.3s ease; 
+            box-shadow: 0 8px 32px rgba(163, 201, 226, 0.15); 
         }
 
         .btn-scan-main { 
             width: 150px; height: 150px; background: white; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 18px; color: var(--accent-blue); 
-            margin: 40px auto; box-shadow: 0 15px 35px rgba(163, 201, 226, 0.3); 
-            cursor: pointer; border: none;
+            display: flex; align-items: center; justify-content: center; text-align: center;
+            font-size: 18px; color: var(--accent-blue); margin: 60px auto; 
+            box-shadow: 0 15px 35px rgba(163, 201, 226, 0.3); border: none; cursor: pointer;
         }
 
-        .option-box { padding: 15px; border: 1px solid rgba(163, 201, 226, 0.3); background: rgba(255,255,255,0.4); margin-bottom: 10px; cursor: pointer; border-radius: 12px; }
-        .option-box.selected { background: white; border-color: var(--accent-blue); box-shadow: 4px 4px 0 var(--accent-blue); }
+        .option-box { padding: 16px; border: 1px solid rgba(163, 201, 226, 0.2); background: white; margin-bottom: 10px; cursor: pointer; border-radius: 12px; transition: 0.2s; }
+        .option-box.selected { border-color: var(--accent-blue); background: #F0F7FF; box-shadow: inset 0 0 0 1px var(--accent-blue); }
 
-        .qa-btn { flex:1; padding:12px; border:1px solid #DDD; background:white; border-radius: 8px; cursor:pointer; font-size: 14px; }
-        .qa-btn.focused { background: var(--accent-blue) !important; color: white !important; border-color: var(--accent-blue) !important; font-weight: bold; }
+        .qa-btn { flex:1; padding:14px; border:1px solid #E2E8F0; background:white; border-radius: 10px; cursor:pointer; font-size: 14px; transition: 0.2s; }
+        .qa-btn.focused { background: var(--accent-blue) !important; color: white !important; border-color: var(--accent-blue) !important; font-weight: bold; transform: scale(1.02); }
 
         .btn-blue { 
-            background: var(--accent-blue); color: white; border: none; 
-            padding: 16px; width: 100%; font-size: 16px; 
-            border-radius: 12px; cursor: pointer; font-weight: bold;
-            margin-top: 10px;
+            background: var(--accent-blue); color: white; border: none; padding: 18px; 
+            width: 100%; font-size: 16px; border-radius: 14px; cursor: pointer; font-weight: bold;
+            box-shadow: 0 4px 15px rgba(90, 155, 213, 0.3);
         }
 
-        .upload-slot { border: 1.5px dashed var(--main-blue); padding: 15px; margin-bottom: 12px; text-align: center; border-radius: 12px; background: rgba(255,255,255,0.3); }
-        #splash-screen { position: fixed; inset: 0; background: #F0F7FF; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.8s ease; }
-        .scan-modal { display: none; position: fixed; inset: 0; background: var(--bg-blue); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
-        .scan-line { width: 220px; height: 2px; background: var(--accent-blue); box-shadow: 0 0 15px var(--accent-blue); position: relative; animation: scan 2s infinite linear; }
-        @keyframes scan { 0%, 100% { top: -60px; } 50% { top: 60px; } }
+        .upload-slot { border: 1.5px dashed var(--main-blue); padding: 20px; margin-bottom: 15px; text-align: center; border-radius: 14px; background: rgba(255,255,255,0.4); }
+        #splash-screen { position: fixed; inset: 0; background: #F0F7FF; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .coze-web-sdk-chat-button { display: none !important; }
     </style>
 </head>
 <body>
     <div id="splash-screen">
-        <div style="width: 70px; height: 70px; background: white; border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.05); margin-bottom: 15px;"><span style="font-size: 28px;">🛡️</span></div>
-        <h2 style="color: #5A9BD5; font-weight: 200; letter-spacing: 4px;">壳里 Kelly</h2>
+        <div style="font-size: 40px; margin-bottom: 20px;">🛡️</div>
+        <h2 style="color: #5A9BD5; font-weight: 300; letter-spacing: 5px;">壳里 Kelly</h2>
     </div>
 
     <div id="page-home" class="page active">
-        <div class="scroll-content">
-            <h1 style="font-weight: 200; color: var(--accent-blue); letter-spacing: 5px; margin-top: 40px; text-align: center;">壳里 Kelly</h1>
-            <div class="btn-scan-main" onclick="openSelector()">开启守护</div>
+        <div class="scroll-content" style="display:flex; flex-direction:column; align-items:center;">
+            <h1 style="font-weight: 200; color: var(--accent-blue); letter-spacing: 5px; margin-top: 60px;">壳里 Kelly</h1>
+            <button class="btn-scan-main" onclick="openSelector()">开启守护</button>
         </div>
-        <div class="glass-card" style="margin-bottom: 0;">
+        <div class="glass-card" style="margin-bottom:0;">
             <strong>女性互助社群</strong>
-            <p style="font-size: 11px; color: #9AB; margin-top: 5px;">查看 5,000+ 真实入住风险预警</p>
+            <p style="font-size: 11px; color: #9AB; margin-top: 5px;">已为 5,000+ 用户提供安全预警</p>
         </div>
     </div>
 
-    <div id="modal-select" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.2); backdrop-filter:blur(5px); z-index:500; align-items:flex-end;">
-        <div style="background:white; width:100%; padding:25px 20px calc(25px + var(--safe-bottom)); border-radius:24px 24px 0 0; box-sizing:border-box;">
-            <h3 style="margin-top:0; font-weight: 400;">请选择检测部位</h3>
+    <div id="modal-select" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.3); backdrop-filter:blur(8px); z-index:500; align-items:flex-end;">
+        <div style="background:white; width:100%; padding:30px 20px calc(20px + var(--safe-bottom)); border-radius:28px 28px 0 0; box-sizing:border-box; max-height:85vh; overflow-y:auto;">
+            <h3 style="margin:0 0 20px 0; font-weight:400; text-align:center;">请选择检测部位 (可多选)</h3>
             <div class="option-box" onclick="toggleSelect(this, '门锁')">门锁安全检查</div>
             <div class="option-box" onclick="toggleSelect(this, '窗户')">窗户外部检查</div>
             <div class="option-box" onclick="toggleSelect(this, '镜子')">双面镜检测</div>
             <div class="option-box" onclick="toggleSelect(this, '浴室')">浴室通风口检查</div>
-            <button class="btn-blue" onclick="startQA()">确认并开始</button>
+            <div class="option-box" onclick="toggleSelect(this, '插座')">插座与面板检查</div>
+            <div class="option-box" onclick="toggleSelect(this, '路由器')">路由器与信号检查</div>
+            <button class="btn-blue" style="margin-top:10px;" onclick="startQA()">确认并开启引导</button>
         </div>
     </div>
 
     <div id="page-qa" class="page">
-        <h2 style="font-weight: 300; margin-top: 10px;">安全自查引导</h2>
+        <h2 style="font-weight:300; margin: 10px 0 20px 0;">安全自查引导</h2>
         <div id="qa-render" class="scroll-content"></div>
-        <button class="btn-blue" onclick="renderUploads()">完成自查并去上传</button>
+        <button class="btn-blue" onclick="renderUploads()">完成自查并去拍照</button>
     </div>
 
     <div id="page-upload" class="page">
-        <h2 style="font-weight: 300; margin-top: 10px;">影像取证上传</h2>
+        <h2 style="font-weight:300; margin: 10px 0 20px 0;">影像取证上传</h2>
         <div id="upload-render" class="scroll-content"></div>
         <button class="btn-blue" onclick="finalProcess()">提交 AI 专家深度分析</button>
-    </div>
-
-    <div id="scan-screen" class="scan-modal">
-        <div class="scan-line"></div>
-        <h3 style="margin-top:40px; color:var(--accent-blue); font-weight:200;">HerGuard 引擎正在接入...</h3>
     </div>
 
     <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
     <script>
         let selections = [];
         const qaData = {
-            '门锁': '请握住门把手，用力上下左右摇晃几下。你会感觉到明显的松动，或者听到金属零件松脱的撞击声吗？',
-            '窗户': '请把头探出窗外看一眼。窗户的 1 米范围内，是否有空调外机、粗水管或邻居的凸出阳台？',
-            '镜子': '请用手指关节敲击镜子中心。你听到的声音是实心的闷响（像敲墙），还是空心的脆响？',
-            '浴室': '请抬头观察排气扇。透过格栅，你是否能看到内部有不明的黑色圆孔、红点或破坏痕迹？'
+            '门锁': '请握住门把手，用力上下左右摇晃。你会感觉到明显的松动，或听到金属零件松脱的撞击声吗？',
+            '窗户': '请探头观察。窗户 1 米内是否有空调外机、粗水管或邻居凸出的阳台？',
+            '镜子': '请用手指关节敲击镜子。听到的声音是实心的闷响，还是空心的脆响？',
+            '浴室': '观察排气扇格栅。内部是否有不明黑色圆孔、红点，或人为破坏痕迹？',
+            '插座': '观察墙面上正对床铺的插座。缝隙处是否有异常的反光点或歪斜的遮挡物？',
+            '路由器': '检查路由器底部或背面。除了网线孔，是否有额外的、未连接线缆的微型小孔？'
         };
 
+        // 修复 SDK 报错
         const cozeWebSDK = new CozeWebSDK.WebChatClient({
             config: { bot_id: '7588350694353649679' },
             auth: {
-                type: 'token',
-                token: 'cztei_qS0HoZGrmCfjZNVBwzJlBBxFEhKP2boTUWLvZq33v633AN7HxujXE6wUwe6pnIFSO',
+                type: 'token', token: 'cztei_qS0HoZGrmCfjZNVBwzJlBBxFEhKP2boTUWLvZq33v633AN7HxujXE6wUwe6pnIFSO',
                 onRefreshToken: function () { return 'cztei_qS0HoZGrmCfjZNVBwzJlBBxFEhKP2boTUWLvZq33v633AN7HxujXE6wUwe6pnIFSO'; }
             }
         });
@@ -149,8 +125,8 @@
         window.addEventListener('load', () => {
             setTimeout(() => {
                 const s = document.getElementById('splash-screen');
-                if(s){ s.style.opacity = '0'; setTimeout(() => s.style.display = 'none', 800); }
-            }, 1200);
+                if(s){ s.style.opacity = '0'; setTimeout(() => s.style.display = 'none', 600); }
+            }, 1000);
         });
 
         function openSelector() { document.getElementById('modal-select').style.display = 'flex'; }
@@ -164,17 +140,17 @@
         function handleFocus(btn) {
             btn.parentElement.querySelectorAll('.qa-btn').forEach(b => b.classList.remove('focused'));
             btn.classList.add('focused');
-            setTimeout(() => { btn.parentElement.parentElement.style.opacity = '0.7'; }, 200);
+            setTimeout(() => { btn.parentElement.parentElement.style.opacity = '0.6'; }, 300);
         }
 
         function startQA() {
-            if(selections.length === 0) return alert("请选择检测项");
+            if(selections.length === 0) return alert("请至少选择一个检测项");
             document.getElementById('modal-select').style.display = 'none';
             const container = document.getElementById('qa-render');
             container.innerHTML = selections.map(s => `
                 <div class="glass-card">
                     <strong>${s}部位自查：</strong>
-                    <p style="font-size:13px; margin: 8px 0; line-height:1.4;">${qaData[s]}</p>
+                    <p style="font-size:13px; margin: 10px 0; line-height:1.5;">${qaData[s]}</p>
                     <div style="display:flex; gap:10px;">
                         <button class="qa-btn" onclick="handleFocus(this)">是 / 有异常</button>
                         <button class="qa-btn" onclick="handleFocus(this)">否 / 正常</button>
@@ -189,9 +165,9 @@
             const container = document.getElementById('upload-render');
             container.innerHTML = selections.map((s, i) => `
                 <div class="upload-slot" onclick="document.getElementById('f-${i}').click()">
-                    <div style="font-size:13px; color:var(--accent-blue)">点击拍摄上传【${s}】实拍图</div>
-                    <input type="file" id="f-${i}" hidden onchange="const img=this.nextElementSibling; img.style.display='block'; img.src=URL.createObjectURL(this.files[0])">
-                    <img style="display:none; width:100%; margin-top:8px; border-radius:8px;">
+                    <div style="font-size:13px; color:var(--accent-blue)">点击拍照上传【${s}】实拍图</div>
+                    <input type="file" id="f-${i}" accept="image/*" hidden onchange="const img=this.nextElementSibling; img.style.display='block'; img.src=URL.createObjectURL(this.files[0])">
+                    <img style="display:none; width:100%; margin-top:10px; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
                 </div>
             `).join('');
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -199,10 +175,8 @@
         }
 
         function finalProcess() {
-            document.getElementById('scan-screen').style.display = 'flex';
-            setTimeout(() => {
-                window.location.href = "https://www.coze.cn/store/agent/7588350694353649679?bot_id=true&bid=6ijukogrc9g13";
-            }, 2500);
+            // 跳转至商店页
+            window.location.href = "https://www.coze.cn/store/agent/7588350694353649679?bot_id=true&bid=6ijukogrc9g13";
         }
     </script>
 </body>
