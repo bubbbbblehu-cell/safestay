@@ -8,7 +8,7 @@
         :root { 
             --bg-blue: #F0F7FF; --main-blue: #A3C9E2; --accent-blue: #5A9BD5; 
             --glass-white: rgba(255, 255, 255, 0.85); --text-main: #4A5568; 
-            --safe-bottom: env(safe-area-inset-bottom);
+            --risk-red: #F56565; --safe-bottom: env(safe-area-inset-bottom);
         }
         
         body, html { 
@@ -18,17 +18,18 @@
             -webkit-tap-highlight-color: transparent; overflow-x: hidden;
         }
 
-        /* 页面基础容器 */
-        .page { 
-            display: none; padding: 20px; 
-            box-sizing: border-box; min-height: 100vh; flex-direction: column;
-            animation: fadeIn 0.3s ease;
-        }
+        .page { display: none; padding: 20px; box-sizing: border-box; min-height: 100vh; flex-direction: column; animation: fadeIn 0.3s ease; }
         .page.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* 内容区：确保滚动顺畅 */
         .scroll-content { flex: 1; padding-bottom: 120px; }
+
+        /* 图标样式补回 */
+        .app-icon {
+            width: 70px; height: 70px; background: white; border-radius: 20px; 
+            display: flex; align-items: center; justify-content: center; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05); margin-bottom: 20px; font-size: 32px;
+        }
 
         .glass-card { 
             background: var(--glass-white); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
@@ -37,20 +38,21 @@
             box-shadow: 0 8px 32px rgba(163, 201, 226, 0.15); 
         }
 
+        .risk-point { font-size: 11px; color: var(--risk-red); background: rgba(245, 101, 101, 0.08); padding: 8px; border-radius: 6px; margin-bottom: 12px; border-left: 3px solid var(--risk-red); }
+
         .btn-scan-main { 
             width: 150px; height: 150px; background: white; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; text-align: center;
-            font-size: 18px; color: var(--accent-blue); margin: 80px auto; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 18px; color: var(--accent-blue); margin: 40px auto; 
             box-shadow: 0 15px 35px rgba(163, 201, 226, 0.3); border: none; cursor: pointer;
         }
 
         .option-box { padding: 16px; border: 1px solid rgba(163, 201, 226, 0.2); background: white; margin-bottom: 10px; cursor: pointer; border-radius: 12px; }
         .option-box.selected { border-color: var(--accent-blue); background: #F0F7FF; box-shadow: inset 0 0 0 1px var(--accent-blue); }
 
-        .qa-btn { flex:1; padding:14px; border:1px solid #E2E8F0; background:white; border-radius: 10px; cursor:pointer; font-size: 14px; outline:none; }
+        .qa-btn { flex:1; padding: 14px; border: 1px solid #E2E8F0; background: white; border-radius: 10px; cursor: pointer; font-size: 14px; }
         .qa-btn.focused { background: var(--accent-blue) !important; color: white !important; font-weight: bold; }
 
-        /* 强制底部固定的操作栏 */
         .fixed-bottom-bar {
             position: fixed; bottom: 0; left: 0; right: 0;
             padding: 15px 20px calc(15px + var(--safe-bottom));
@@ -58,33 +60,23 @@
             box-shadow: 0 -5px 15px rgba(0,0,0,0.05); z-index: 999;
         }
 
-        .btn-blue { 
-            background: var(--accent-blue); color: white; border: none; padding: 18px; 
-            width: 100%; font-size: 16px; border-radius: 14px; cursor: pointer; font-weight: bold;
-            box-shadow: 0 4px 12px rgba(90, 155, 213, 0.2);
-        }
+        .btn-blue { background: var(--accent-blue); color: white; border: none; padding: 18px; width: 100%; font-size: 16px; border-radius: 14px; cursor: pointer; font-weight: bold; }
 
-        /* 上传框样式优化 */
-        .upload-slot { 
-            border: 2px dashed var(--main-blue); padding: 25px 15px; margin-bottom: 20px; 
-            text-align: center; border-radius: 16px; background: white;
-            transition: 0.3s; cursor: pointer;
-        }
-        .upload-slot:active { transform: scale(0.98); background: #F0F7FF; }
-        
+        .upload-slot { border: 2px dashed var(--main-blue); padding: 25px 15px; margin-bottom: 20px; text-align: center; border-radius: 16px; background: white; cursor: pointer; }
         #splash-screen { position: fixed; inset: 0; background: #F0F7FF; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .coze-web-sdk-chat-button { display: none !important; }
     </style>
 </head>
 <body>
     <div id="splash-screen">
-        <div style="font-size: 40px; margin-bottom: 20px;">🛡️</div>
+        <div class="app-icon">🛡️</div>
         <h2 style="color: #5A9BD5; font-weight: 300; letter-spacing: 5px;">壳里 Kelly</h2>
     </div>
 
     <div id="page-home" class="page active">
-        <div class="scroll-content">
-            <h1 style="font-weight: 200; color: var(--accent-blue); letter-spacing: 5px; margin-top: 60px; text-align: center;">壳里 Kelly</h1>
+        <div class="scroll-content" style="display:flex; flex-direction:column; align-items:center;">
+            <div class="app-icon" style="margin-top: 40px;">🛡️</div>
+            <h1 style="font-weight: 200; color: var(--accent-blue); letter-spacing: 5px;">壳里 Kelly</h1>
             <button class="btn-scan-main" onclick="openSelector()">开启守护</button>
         </div>
         <div class="fixed-bottom-bar" style="background:none; box-shadow:none; position:relative;">
@@ -109,35 +101,28 @@
     </div>
 
     <div id="page-qa" class="page">
-        <div class="scroll-content" id="qa-render">
-            </div>
-        <div class="fixed-bottom-bar">
-            <button class="btn-blue" onclick="renderUploads()">完成自查，去拍摄照片</button>
-        </div>
+        <div class="scroll-content" id="qa-render"></div>
+        <div class="fixed-bottom-bar"><button class="btn-blue" onclick="renderUploads()">完成自查，去拍摄照片</button></div>
     </div>
 
     <div id="page-upload" class="page">
         <h2 style="font-weight:300; margin: 20px 0;">影像取证上传</h2>
-        <div class="scroll-content" id="upload-render">
-            </div>
-        <div class="fixed-bottom-bar">
-            <button class="btn-blue" onclick="finalProcess()">提交 AI 专家深度分析</button>
-        </div>
+        <div class="scroll-content" id="upload-render"></div>
+        <div class="fixed-bottom-bar"><button class="btn-blue" onclick="finalProcess()">提交 AI 专家深度分析</button></div>
     </div>
 
     <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
     <script>
         let selections = [];
         const qaData = {
-            '门锁': '请握住门把手，用力上下左右摇晃。你会感觉到明显的松动，或听到金属零件松脱的撞击声吗？',
-            '窗户': '请探头观察。窗户 1 米内是否有空调外机、粗水管或邻居凸出的阳台？',
-            '镜子': '请用手指关节敲击镜子。听到的声音是实心的闷响，还是空心的脆响？',
-            '浴室': '观察排气扇格栅。内部是否有不明黑色圆孔、红点，或人为破坏痕迹？',
-            '插座': '观察墙面上正对床铺的插座。缝隙处是否有异常的反光点或歪斜的遮挡物？',
-            '路由器': '检查路由器底部或背面。除了网线孔，是否有额外的、未连接线缆的微型小孔？'
+            '门锁': { q: '请握住门把手，用力上下左右摇晃。你会感觉到明显的松动，或听到金属零件松脱的撞击声吗？', r: '⚠️ 潜在风险：门锁松动可能意味着锁芯被撬动过，或存在机械故障导致无法从内部完全反锁。' },
+            '窗户': { q: '请探头观察。窗户 1 米内是否有空调外机、粗水管或邻居凸出的阳台？', r: '⚠️ 潜在风险：外部平台是入室盗窃的“踏板”，如距离过近，极易通过攀爬进入。' },
+            '镜子': { q: '请用手指关节敲击镜子。听到的声音是实心的闷响，还是空心的脆响？', r: '⚠️ 潜在风险：脆响可能意味着镜后有空腔，存在安装“双面镜”进行偷拍的可能。' },
+            '浴室': { q: '观察排气扇格栅。内部是否有不明黑色圆孔、红点，或人为破坏痕迹？', r: '⚠️ 潜在风险：通风口是隐藏式摄像头最常选择的安放点，格栅破损通常是后期安装留下的。' },
+            '插座': { q: '观察墙面上正对床铺的插座。缝隙处是否有异常的反光点或歪斜的遮挡物？', r: '⚠️ 潜在风险：针孔摄像头常伪装在电源插座孔内，利用内部电流长期供电。' },
+            '路由器': { q: '检查路由器底部或背面。除了网线孔，是否有额外的、未连接线缆的微型小孔？', r: '⚠️ 潜在风险：改装过的路由器内部可能嵌入了网络传输型偷拍设备。' }
         };
 
-        // 处理 SDK 报错
         const cozeWebSDK = new CozeWebSDK.WebChatClient({
             config: { bot_id: '7588350694353649679' },
             auth: {
@@ -154,7 +139,6 @@
         });
 
         function openSelector() { document.getElementById('modal-select').style.display = 'flex'; }
-        
         function toggleSelect(el, val) {
             el.classList.toggle('selected');
             if(el.classList.contains('selected')) { if(!selections.includes(val)) selections.push(val); }
@@ -167,28 +151,25 @@
             setTimeout(() => { btn.parentElement.parentElement.style.opacity = '0.5'; }, 300);
         }
 
-        // 核心跳转逻辑：从部位选择 -> 问答
         function startQA() {
             if(selections.length === 0) return alert("请选择检测部位");
             document.getElementById('modal-select').style.display = 'none';
-            
             const container = document.getElementById('qa-render');
             container.innerHTML = `<h2 style="font-weight:300; margin-top:20px;">安全自查引导</h2>` + 
                 selections.map(s => `
                 <div class="glass-card">
                     <strong>${s}部位自查：</strong>
-                    <p style="font-size:13px; margin: 10px 0; line-height:1.5;">${qaData[s]}</p>
+                    <p style="font-size:13px; margin: 10px 0; line-height:1.5;">${qaData[s].q}</p>
+                    <div class="risk-point">${qaData[s].r}</div>
                     <div style="display:flex; gap:10px;">
                         <button class="qa-btn" onclick="handleFocus(this)">有异常</button>
                         <button class="qa-btn" onclick="handleFocus(this)">正常</button>
                     </div>
                 </div>
             `).join('');
-
             switchPage('page-qa');
         }
 
-        // 核心跳转逻辑：从问答 -> 上传 (关键修复点)
         function renderUploads() {
             const container = document.getElementById('upload-render');
             container.innerHTML = selections.map((s, i) => `
@@ -199,17 +180,12 @@
                     <img style="display:none; width:100%; margin-top:10px; border-radius:12px;">
                 </div>
             `).join('');
-
             switchPage('page-upload');
         }
 
         function switchPage(pageId) {
-            // 1. 隐藏所有页面
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            // 2. 显示目标页面
-            const target = document.getElementById(pageId);
-            target.classList.add('active');
-            // 3. 强制滚动回顶部，防止视觉错位
+            document.getElementById(pageId).classList.add('active');
             window.scrollTo(0, 0);
         }
 
@@ -218,13 +194,10 @@
                 const img = input.nextElementSibling;
                 img.src = URL.createObjectURL(input.files[0]);
                 img.style.display = 'block';
-                input.parentElement.style.borderColor = '#A3C9E2';
-                input.parentElement.style.background = '#F0F7FF';
             }
         }
 
         function finalProcess() {
-            // 跳转至商店页
             window.location.href = "https://www.coze.cn/store/agent/7588350694353649679?bot_id=true&bid=6ijukogrc9g13";
         }
     </script>
