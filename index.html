@@ -5,125 +5,89 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SafeStay</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="SafeStay">
-    <link rel="apple-touch-icon" href="icon.png">
-    
     <style>
-        :root { --bg-blue: #F0F7FF; --main-blue: #A3C9E2; --accent-blue: #5A9BD5; --glass-white: rgba(255, 255, 255, 0.85); --text-main: #4A5568; }
-        body, html { margin: 0; padding: 0; min-height: 100vh; background: linear-gradient(135deg, #F5F9FF 0%, #EBF4FF 100%); font-family: -apple-system, sans-serif; color: var(--text-main); -webkit-tap-highlight-color: transparent; overflow: hidden; }
-        
-        /* 启动页 */
-        #splash-screen { position: fixed; inset: 0; background: #F0F7FF; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.8s ease; }
-        
-        /* 页面通用 */
-        .page { display: none; padding: 25px; box-sizing: border-box; min-height: 100vh; animation: fadeIn 0.4s ease; }
-        .page.active { display: flex; flex-direction: column; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* 卡片风格 */
-        .glass-card { background: var(--glass-white); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.6); padding: 24px; margin-bottom: 20px; border-radius: 20px; box-shadow: 10px 10px 25px rgba(163, 201, 226, 0.2); }
-        
-        /* 扫描按钮 */
-        .btn-scan-main { width: 170px; height: 170px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--accent-blue); margin: 60px auto; box-shadow: 0 15px 40px rgba(163, 201, 226, 0.4); cursor: pointer; transition: transform 0.2s; }
-        .btn-scan-main:active { transform: scale(0.95); }
-
-        /* 选项 */
-        .option-box { padding: 18px; border: 1px solid rgba(163, 201, 226, 0.3); background: rgba(255,255,255,0.5); margin-bottom: 12px; cursor: pointer; border-radius: 12px; transition: 0.2s; }
-        .option-box.selected { background: white; border-color: var(--accent-blue); box-shadow: 0 4px 10px rgba(90, 155, 213, 0.15); }
-        
-        /* 按钮 */
-        .btn-blue { background: var(--accent-blue); color: white; border: none; padding: 18px; width: 100%; font-size: 16px; margin-top: auto; border-radius: 15px; cursor: pointer; font-weight: 500; }
-
-        /* 扫描动画 */
-        .scan-modal { display: none; position: fixed; inset: 0; background: var(--bg-blue); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
-        .scan-line { width: 280px; height: 2px; background: var(--accent-blue); box-shadow: 0 0 20px var(--accent-blue); position: absolute; animation: scan 2s infinite ease-in-out; }
-        @keyframes scan { 0% { top: 30%; opacity: 0; } 50% { opacity: 1; } 100% { top: 70%; opacity: 0; } }
-        
-        .upload-slot { border: 2px dashed var(--main-blue); padding: 20px; margin-bottom: 15px; text-align: center; border-radius: 15px; background: rgba(255,255,255,0.3); }
+        :root { --bg-blue: #F0F7FF; --main-blue: #A3C9E2; --accent-blue: #5A9BD5; --text-main: #4A5568; }
+        body, html { margin: 0; padding: 0; min-height: 100vh; background: #F5F9FF; font-family: -apple-system, sans-serif; color: var(--text-main); overflow: hidden; }
+        .page { display: none; padding: 25px; min-height: 100vh; flex-direction: column; box-sizing: border-box; }
+        .page.active { display: flex; }
+        .btn-scan-main { width: 160px; height: 160px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--accent-blue); margin: 60px auto; box-shadow: 0 10px 30px rgba(163,201,226,0.4); border: none; }
+        .upload-slot { border: 2px dashed var(--main-blue); padding: 20px; margin-bottom: 15px; text-align: center; border-radius: 15px; background: rgba(255,255,255,0.5); }
+        #scan-screen { display: none; position: fixed; inset: 0; background: #F0F7FF; z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
+        .scan-line { width: 80%; height: 2px; background: var(--accent-blue); position: absolute; box-shadow: 0 0 15px var(--accent-blue); animation: moveScan 2s infinite ease-in-out; }
+        @keyframes moveScan { 0% { top: 30%; } 50% { top: 70%; } 100% { top: 30%; } }
+        .btn-blue { background: var(--accent-blue); color: white; border: none; padding: 18px; width: 100%; border-radius: 15px; font-size: 16px; margin-top: auto; }
+        /* 隐藏 SDK 默认按钮，让我们的 UI 触发它 */
+        .coze-web-sdk-chat-button { display: none !important; }
     </style>
 </head>
 <body>
-    <div id="splash-screen">
-        <div style="width: 80px; height: 80px; background: white; border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(163,201,226,0.3);">
-            <span style="font-size: 40px;">🛡️</span>
-        </div>
-        <h2 style="color: #5A9BD5; font-weight: 300; letter-spacing: 4px; margin-top: 20px;">SafeStay</h2>
-    </div>
 
     <div id="page-home" class="page active">
-        <h1 style="font-weight: 200; color: var(--accent-blue); text-align: center; margin-top: 40px;">安全守护</h1>
-        <div class="btn-scan-main" onclick="openSelector()">开始检测</div>
-        <div class="glass-card" style="margin-top: auto;">
-            <strong>为什么选择 SafeStay?</strong>
-            <p style="font-size: 12px; color: #9AB; margin-top: 8px;">针对酒店、民宿环境，通过 AI 影像识别守护你的入住安全。</p>
-        </div>
-    </div>
-
-    <div id="modal-select" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.1); backdrop-filter:blur(10px); z-index:500; align-items:flex-end;">
-        <div style="background:white; width:100%; padding:30px; border-radius:30px 30px 0 0; box-sizing:border-box;">
-            <h3 style="margin-bottom:20px;">请选择检测部位</h3>
-            <div class="option-box" onclick="toggleSelect(this, '门锁')">门锁安全检查</div>
-            <div class="option-box" onclick="toggleSelect(this, '插座')">插座/针孔镜头排查</div>
-            <div class="option-box" onclick="toggleSelect(this, '镜子')">浴室双面镜检测</div>
-            <button class="btn-blue" onclick="startQA()">确认</button>
-        </div>
+        <h1 style="text-align:center; color:var(--accent-blue); font-weight:300; margin-top:50px;">SafeStay</h1>
+        <button class="btn-scan-main" onclick="goToUpload()">开始安全检测</button>
     </div>
 
     <div id="page-upload" class="page">
-        <h2 style="font-weight: 300;">影像取证</h2>
-        <div id="upload-render" style="flex:1; overflow-y:auto;"></div>
-        <button class="btn-blue" onclick="finalProcess()">提交 AI 专家分析</button>
+        <h2 style="font-weight:300;">影像取证</h2>
+        <div class="upload-slot" onclick="document.getElementById('file-input').click()">
+            <div style="color:var(--accent-blue)">📷 点击拍摄环境照片</div>
+            <input type="file" id="file-input" hidden accept="image/*" onchange="preview(this)">
+            <img id="pre-view" style="display:none; width:100%; margin-top:10px; border-radius:10px;">
+        </div>
+        <button class="btn-blue" onclick="startAgent()">提交 AI 专家分析</button>
     </div>
 
-    <div id="scan-screen" class="scan-modal">
+    <div id="scan-screen">
         <div class="scan-line"></div>
-        <h3 style="margin-top:40px; color:var(--accent-blue);">AI 正在分析影像...</h3>
-        <p style="font-size: 12px; color: #9AB;">正在连接加密安全引擎</p>
+        <h3 style="margin-top:50px; color:var(--accent-blue);">HerGuard 引擎正在介入...</h3>
     </div>
+
+    <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
 
     <script>
-        let selections = [];
-        
-        // 启动页控制
-        window.onload = () => setTimeout(() => {
-            const ss = document.getElementById('splash-screen');
-            ss.style.opacity = '0';
-            setTimeout(() => ss.style.display = 'none', 800);
-        }, 1500);
+        // 2. 初始化 Agent
+        const cozeWebSDK = new CozeWebSDK.WebChatClient({
+            config: {
+                bot_id: '7588350694353649679', // 你的 Bot ID
+            },
+            componentProps: {
+                title: 'SafeStay 安全专家',
+                initialHeight: 600,
+            },
+            auth: {
+                type: 'token',
+                token: 'cztei_qS0HoZGrmCfjZNVBwzJlBBxFEhKP2boTUWLvZq33v633AN7HxujXE6wUwe6pnIFSO', // 你的有效 Token
+            }
+        });
 
-        function openSelector() { document.getElementById('modal-select').style.display = 'flex'; }
-        
-        function toggleSelect(el, val) {
-            el.classList.toggle('selected');
-            if(el.classList.contains('selected')) selections.push(val);
-            else selections = selections.filter(s => s !== val);
-        }
-
-        function startQA() {
-            if(selections.length === 0) return alert("请选择检测项");
-            document.getElementById('modal-select').style.display = 'none';
-            const container = document.getElementById('upload-render');
-            container.innerHTML = selections.map((s, i) => `
-                <div class="upload-slot" onclick="document.getElementById('f-${i}').click()">
-                    <div style="color:var(--accent-blue)">📷 点击拍摄${s}照片</div>
-                    <input type="file" id="f-${i}" hidden accept="image/*" onchange="this.nextElementSibling.style.display='block';this.nextElementSibling.src=URL.createObjectURL(this.files[0])">
-                    <img style="display:none; width:100%; margin-top:10px; border-radius:10px;">
-                </div>
-            `).join('');
+        function goToUpload() {
             document.getElementById('page-home').classList.remove('active');
             document.getElementById('page-upload').classList.add('active');
         }
 
-        // 核心跳转逻辑：不使用 SDK，防止白屏
-        function finalProcess() {
-            // 展示专业的扫描动画
+        function preview(input) {
+            if (input.files && input.files[0]) {
+                const img = document.getElementById('pre-view');
+                img.style.display = 'block';
+                img.src = URL.createObjectURL(input.files[0]);
+            }
+        }
+
+        // 3. 核心调用逻辑：直接拉起 Agent 对话
+        function startAgent() {
             document.getElementById('scan-screen').style.display = 'flex';
             
-            // 3秒后跳转到你的 Bot 对话空间
-            setTimeout(() => {
-                window.location.href = "https://www.coze.cn/space/7383534396151693331/bot/7588350694353649679";
-            }, 3000);
+            setTimeout(function() {
+                document.getElementById('scan-screen').style.display = 'none';
+                // 模拟点击 SDK 隐藏按钮，直接呼出对话框
+                const chatBtn = document.querySelector('.coze-web-sdk-chat-button');
+                if (chatBtn) {
+                    chatBtn.click();
+                } else {
+                    // 如果 SDK 没加载出来，跳转作为兜底
+                    window.location.href = "https://www.coze.cn/space/7383534396151693331/bot/7588350694353649679";
+                }
+            }, 2500);
         }
     </script>
 </body>
