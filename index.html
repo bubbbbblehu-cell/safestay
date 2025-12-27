@@ -11,7 +11,7 @@
     
     <style>
         :root { --bg-blue: #F0F7FF; --main-blue: #A3C9E2; --accent-blue: #5A9BD5; --glass-white: rgba(255, 255, 255, 0.85); --text-main: #4A5568; }
-        body, html { margin: 0; padding: 0; min-height: 100vh; background: linear-gradient(135deg, #F5F9FF 0%, #EBF4FF 100%); font-family: -apple-system, sans-serif; color: var(--text-main); -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
+        body, html { margin: 0; padding: 0; min-height: 100vh; background: linear-gradient(135deg, #F5F9FF 0%, #EBF4FF 100%); font-family: -apple-system, sans-serif; color: var(--text-main); -webkit-tap-highlight-color: transparent; overflow: hidden; }
         
         /* 启动页 */
         #splash-screen { position: fixed; inset: 0; background: #F0F7FF; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.8s ease; }
@@ -37,12 +37,94 @@
 
         /* 扫描动画 */
         .scan-modal { display: none; position: fixed; inset: 0; background: var(--bg-blue); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
-        .scan-line { width: 280px; height: 2px; background: var(--accent-blue); box-shadow: 0 0 20px var(--accent-blue); position: relative; animation: scan 2s infinite ease-in-out; }
-        @keyframes scan { 0% { top: -100px; opacity: 0; } 50% { opacity: 1; } 100% { top: 100px; opacity: 0; } }
+        .scan-line { width: 280px; height: 2px; background: var(--accent-blue); box-shadow: 0 0 20px var(--accent-blue); position: absolute; animation: scan 2s infinite ease-in-out; }
+        @keyframes scan { 0% { top: 30%; opacity: 0; } 50% { opacity: 1; } 100% { top: 70%; opacity: 0; } }
         
         .upload-slot { border: 2px dashed var(--main-blue); padding: 20px; margin-bottom: 15px; text-align: center; border-radius: 15px; background: rgba(255,255,255,0.3); }
     </style>
 </head>
 <body>
     <div id="splash-screen">
-        <div style="width: 80px; height: 80px; background: white; border-radius:
+        <div style="width: 80px; height: 80px; background: white; border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(163,201,226,0.3);">
+            <span style="font-size: 40px;">🛡️</span>
+        </div>
+        <h2 style="color: #5A9BD5; font-weight: 300; letter-spacing: 4px; margin-top: 20px;">SafeStay</h2>
+    </div>
+
+    <div id="page-home" class="page active">
+        <h1 style="font-weight: 200; color: var(--accent-blue); text-align: center; margin-top: 40px;">安全守护</h1>
+        <div class="btn-scan-main" onclick="openSelector()">开始检测</div>
+        <div class="glass-card" style="margin-top: auto;">
+            <strong>为什么选择 SafeStay?</strong>
+            <p style="font-size: 12px; color: #9AB; margin-top: 8px;">针对酒店、民宿环境，通过 AI 影像识别守护你的入住安全。</p>
+        </div>
+    </div>
+
+    <div id="modal-select" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.1); backdrop-filter:blur(10px); z-index:500; align-items:flex-end;">
+        <div style="background:white; width:100%; padding:30px; border-radius:30px 30px 0 0; box-sizing:border-box;">
+            <h3 style="margin-bottom:20px;">请选择检测部位</h3>
+            <div class="option-box" onclick="toggleSelect(this, '门锁')">门锁安全检查</div>
+            <div class="option-box" onclick="toggleSelect(this, '插座')">插座/针孔镜头排查</div>
+            <div class="option-box" onclick="toggleSelect(this, '镜子')">浴室双面镜检测</div>
+            <button class="btn-blue" onclick="startQA()">确认</button>
+        </div>
+    </div>
+
+    <div id="page-upload" class="page">
+        <h2 style="font-weight: 300;">影像取证</h2>
+        <div id="upload-render" style="flex:1; overflow-y:auto;"></div>
+        <button class="btn-blue" onclick="finalProcess()">提交 AI 专家分析</button>
+    </div>
+
+    <div id="scan-screen" class="scan-modal">
+        <div class="scan-line"></div>
+        <h3 style="margin-top:40px; color:var(--accent-blue);">AI 正在分析影像...</h3>
+        <p style="font-size: 12px; color: #9AB;">正在连接加密安全引擎</p>
+    </div>
+
+    <script>
+        let selections = [];
+        
+        // 启动页控制
+        window.onload = () => setTimeout(() => {
+            const ss = document.getElementById('splash-screen');
+            ss.style.opacity = '0';
+            setTimeout(() => ss.style.display = 'none', 800);
+        }, 1500);
+
+        function openSelector() { document.getElementById('modal-select').style.display = 'flex'; }
+        
+        function toggleSelect(el, val) {
+            el.classList.toggle('selected');
+            if(el.classList.contains('selected')) selections.push(val);
+            else selections = selections.filter(s => s !== val);
+        }
+
+        function startQA() {
+            if(selections.length === 0) return alert("请选择检测项");
+            document.getElementById('modal-select').style.display = 'none';
+            const container = document.getElementById('upload-render');
+            container.innerHTML = selections.map((s, i) => `
+                <div class="upload-slot" onclick="document.getElementById('f-${i}').click()">
+                    <div style="color:var(--accent-blue)">📷 点击拍摄${s}照片</div>
+                    <input type="file" id="f-${i}" hidden accept="image/*" onchange="this.nextElementSibling.style.display='block';this.nextElementSibling.src=URL.createObjectURL(this.files[0])">
+                    <img style="display:none; width:100%; margin-top:10px; border-radius:10px;">
+                </div>
+            `).join('');
+            document.getElementById('page-home').classList.remove('active');
+            document.getElementById('page-upload').classList.add('active');
+        }
+
+        // 核心跳转逻辑：不使用 SDK，防止白屏
+        function finalProcess() {
+            // 展示专业的扫描动画
+            document.getElementById('scan-screen').style.display = 'flex';
+            
+            // 3秒后跳转到你的 Bot 对话空间
+            setTimeout(() => {
+                window.location.href = "https://www.coze.cn/space/7383534396151693331/bot/7588350694353649679";
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
