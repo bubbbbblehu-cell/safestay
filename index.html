@@ -1,61 +1,80 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CozyShell - Your Mobile Safety Shield</title>
+    <title>蜗安 CozyShell - 女性安全守护</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="CozyShell">
+    <meta name="apple-mobile-web-app-title" content="蜗安">
+    <link rel="apple-touch-icon" href="icon.png">
     
     <style>
         :root { --bg-blue: #F0F7FF; --main-blue: #A3C9E2; --accent-blue: #5A9BD5; --text-main: #4A5568; }
         body, html { margin: 0; padding: 0; min-height: 100vh; background: #F5F9FF; font-family: -apple-system, sans-serif; color: var(--text-main); overflow: hidden; }
+        
         .page { display: none; padding: 25px; min-height: 100vh; flex-direction: column; box-sizing: border-box; }
         .page.active { display: flex; }
-        .btn-scan-main { width: 160px; height: 160px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--accent-blue); margin: 60px auto; box-shadow: 0 10px 30px rgba(163,201,226,0.4); border: none; cursor: pointer; letter-spacing: 1px; }
-        .upload-slot { border: 2px dashed var(--main-blue); padding: 20px; margin-bottom: 15px; text-align: center; border-radius: 15px; background: rgba(255,255,255,0.5); }
+
+        /* 核心 UI 卡片 */
+        .glass-card { background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); padding: 20px; border-radius: 20px; box-shadow: 0 10px 20px rgba(163,201,226,0.2); margin-top: auto; }
+        
+        /* 启动按钮 */
+        .btn-scan-main { width: 160px; height: 160px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--accent-blue); margin: 60px auto; box-shadow: 0 10px 30px rgba(163,201,226,0.4); border: none; cursor: pointer; }
+
+        /* 拍照预览区域 */
+        .upload-slot { border: 2px dashed var(--main-blue); padding: 30px; margin-bottom: 15px; text-align: center; border-radius: 15px; background: rgba(255,255,255,0.5); cursor: pointer; }
+        #pre-view { width: 100%; margin-top: 15px; border-radius: 12px; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
+        /* 扫描动画 */
         #scan-screen { display: none; position: fixed; inset: 0; background: #F0F7FF; z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
         .scan-line { width: 80%; height: 2px; background: var(--accent-blue); position: absolute; box-shadow: 0 0 15px var(--accent-blue); animation: moveScan 2s infinite ease-in-out; }
-        @keyframes moveScan { 0% { top: 30%; } 50% { top: 70%; } 100% { top: 30%; } }
-        .btn-blue { background: var(--accent-blue); color: white; border: none; padding: 18px; width: 100%; border-radius: 15px; font-size: 16px; margin-top: auto; font-weight: 500; }
-        /* 保持 SDK 隐藏，作为后台静默授权使用 */
+        @keyframes moveScan { 0% { top: 35%; } 50% { top: 65%; } 100% { top: 35%; } }
+
+        .btn-blue { background: var(--accent-blue); color: white; border: none; padding: 18px; width: 100%; border-radius: 15px; font-size: 16px; margin-top: auto; font-weight: bold; }
         .coze-web-sdk-chat-button { display: none !important; }
     </style>
 </head>
 <body>
 
     <div id="page-home" class="page active">
-        <h1 style="text-align:center; color:var(--accent-blue); font-weight:300; margin-top:50px; letter-spacing: 2px;">CozyShell</h1>
-        <button class="btn-scan-main" onclick="goToUpload()">ACTIVATE</button>
-        <div style="text-align:center; margin-top:20px; color:#9AB; font-size:14px;">Your digital refuge in any room.</div>
+        <h1 style="text-align:center; color:var(--accent-blue); font-weight:300; margin-top:50px; letter-spacing: 2px;">蜗安 CozyShell</h1>
+        <button class="btn-scan-main" onclick="goToUpload()">开始检测</button>
+        <div class="glass-card">
+            <strong style="color: var(--accent-blue);">女性随身避风港</strong>
+            <p style="font-size:13px; color:#9AB; margin-top:8px;">无论身处何地，为您提供蜗牛壳般的坚实庇护。</p>
+        </div>
     </div>
 
     <div id="page-upload" class="page">
-        <h2 style="font-weight:300;">Evidence Capture</h2>
+        <h2 style="font-weight:300; color: var(--accent-blue);">环境影像采集</h2>
         <div class="upload-slot" onclick="document.getElementById('file-input').click()">
-            <div style="color:var(--accent-blue)">📷 Tap to capture environment</div>
+            <div style="font-size: 18px;">📷 点击拍摄或上传照片</div>
+            <p style="font-size: 12px; color: #9AB; margin-top: 5px;">请拍摄门锁、插座或镜面区域</p>
             <input type="file" id="file-input" hidden accept="image/*" onchange="preview(this)">
-            <img id="pre-view" style="display:none; width:100%; margin-top:10px; border-radius:10px;">
+            <img id="pre-view">
         </div>
-        <button class="btn-blue" onclick="startAgent()">ANALYZE BY AI AGENT</button>
+        <button class="btn-blue" onclick="startAgent()">启动 AI 专家分析</button>
     </div>
 
     <div id="scan-screen">
         <div class="scan-line"></div>
-        <h3 style="margin-top:50px; color:var(--accent-blue);">HerGuard Engine Active...</h3>
+        <h3 style="margin-top:50px; color:var(--accent-blue);">HerGuard 引擎正在扫描特征...</h3>
+        <p style="color:#9AB; font-size: 13px;">正在连接安全分析通道</p>
     </div>
 
     <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
 
     <script>
-        // 初始化 SDK 以确保授权 token 有效
+        // 初始化并修复 onRefreshToken 报错
         const cozeWebSDK = new CozeWebSDK.WebChatClient({
             config: { bot_id: '7588350694353649679' },
             auth: {
                 type: 'token',
                 token: 'cztei_qS0HoZGrmCfjZNVBwzJlBBxFEhKP2boTUWLvZq33v633AN7HxujXE6wUwe6pnIFSO',
-                onRefreshToken: function () { return 'cztei_qS0HoZGrmCfjZNVBwzJlBBxFEhKP2boTUWLvZq33v633AN7HxujXE6wUwe6pnIFSO'; }
+                onRefreshToken: function () { 
+                    return 'cztei_qS0HoZGrmCfjZNVBwzJlBBxFEhKP2boTUWLvZq33v633AN7HxujXE6wUwe6pnIFSO'; 
+                }
             }
         });
 
@@ -64,6 +83,7 @@
             document.getElementById('page-upload').classList.add('active');
         }
 
+        // 恢复照片预览功能
         function preview(input) {
             if (input.files && input.files[0]) {
                 const img = document.getElementById('pre-view');
@@ -72,12 +92,17 @@
             }
         }
 
-        // 修改跳转至新的商店详情页 URL
         function startAgent() {
+            // 确保已经上传照片
+            if (!document.getElementById('file-input').files[0]) {
+                alert("请先拍摄照片后再进行分析");
+                return;
+            }
+            
             document.getElementById('scan-screen').style.display = 'flex';
             
             setTimeout(function() {
-                // 直接跳转到你指定的新 URL
+                // 跳转到你指定的新详情页 URL
                 window.location.href = "https://www.coze.cn/store/agent/7588350694353649679?bot_id=true&bid=6ijukogrc9g13";
             }, 2500);
         }
