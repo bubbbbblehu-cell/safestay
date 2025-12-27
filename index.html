@@ -12,29 +12,24 @@
         :root { --bg-blue: #F0F7FF; --main-blue: #A3C9E2; --accent-blue: #5A9BD5; --glass-white: rgba(255, 255, 255, 0.8); --text-main: #4A5568; }
         body, html { margin: 0; padding: 0; min-height: 100vh; background: linear-gradient(135deg, #F5F9FF 0%, #EBF4FF 100%); font-family: -apple-system, sans-serif; color: var(--text-main); -webkit-tap-highlight-color: transparent; }
         
-        /* 启动页 */
         #splash-screen { position: fixed; inset: 0; background: #F0F7FF; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.8s ease; }
         
         .page { display: none; padding: 25px; box-sizing: border-box; min-height: 100vh; animation: fadeIn 0.4s ease; }
         .page.active { display: flex; flex-direction: column; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 卡片样式 */
         .glass-card { background: var(--glass-white); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); padding: 20px; margin-bottom: 20px; clip-path: polygon(0 0, 92% 0, 100% 8%, 100% 100%, 0 100%); box-shadow: 10px 10px 20px rgba(163, 201, 226, 0.15); transition: all 0.3s ease; }
         
         .btn-scan-main { width: 160px; height: 160px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--accent-blue); margin: 60px auto; box-shadow: 0 15px 35px rgba(163, 201, 226, 0.3); cursor: pointer; }
 
-        /* 选项框 */
         .option-box { padding: 18px; border: 1px solid rgba(163, 201, 226, 0.3); background: rgba(255,255,255,0.4); margin-bottom: 12px; cursor: pointer; border-radius: 8px; }
         .option-box.selected { background: white; border-color: var(--accent-blue); box-shadow: 4px 4px 0 var(--accent-blue); }
         
-        /* 解决不聚焦问题的答题按钮样式 */
         .qa-btn { flex:1; padding:12px; border:1px solid #DDD; background:white; border-radius: 8px; cursor:pointer; transition: all 0.2s; font-size: 14px; outline: none; }
         .qa-btn.focused { background: var(--accent-blue) !important; color: white !important; border-color: var(--accent-blue) !important; font-weight: bold; transform: scale(1.05); box-shadow: 0 4px 12px rgba(90, 155, 213, 0.3); }
 
         .btn-blue { background: var(--accent-blue); color: white; border: none; padding: 18px; width: 100%; font-size: 16px; margin-top: auto; border-radius: 8px; cursor: pointer; font-weight: bold; }
 
-        /* 扫描动画层 */
         .scan-modal { display: none; position: fixed; inset: 0; background: var(--bg-blue); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
         .scan-line { width: 250px; height: 2px; background: var(--accent-blue); box-shadow: 0 0 15px var(--accent-blue); position: relative; animation: scan 2s infinite linear; }
         @keyframes scan { 0%, 100% { top: -80px; } 50% { top: 80px; } }
@@ -60,4 +55,116 @@
 
     <div id="modal-select" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.1); backdrop-filter:blur(5px); z-index:500; align-items:flex-end;">
         <div style="background:white; width:100%; padding:30px 20px; border-radius:24px 24px 0 0; box-sizing:border-box;">
-            <h3 style="margin-top
+            <h3 style="margin-top:0">请选择检测部位</h3>
+            <div id="check-list">
+                <div class="option-box" onclick="toggleSelect(this, '门锁')">门锁安全检查</div>
+                <div class="option-box" onclick="toggleSelect(this, '窗户')">窗户外部检查</div>
+                <div class="option-box" onclick="toggleSelect(this, '镜子')">双面镜检测</div>
+                <div class="option-box" onclick="toggleSelect(this, '浴室')">浴室通风口检查</div>
+            </div>
+            <button class="btn-blue" onclick="startQA()">确认并开始</button>
+        </div>
+    </div>
+
+    <div id="page-qa" class="page">
+        <h2 style="font-weight: 300;">安全自查引导</h2>
+        <div id="qa-render"></div>
+        <button class="btn-blue" onclick="renderUploads()">完成自查并去上传</button>
+    </div>
+
+    <div id="page-upload" class="page">
+        <h2 style="font-weight: 300;">影像取证上传</h2>
+        <div id="upload-render"></div>
+        <button class="btn-blue" onclick="finalProcess()">提交 AI 专家深度分析</button>
+    </div>
+
+    <div id="scan-screen" class="scan-modal">
+        <div class="scan-line"></div>
+        <h3 style="margin-top:40px; color:var(--accent-blue); font-weight:200;">HerGuard 引擎正在介入...</h3>
+    </div>
+
+    <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
+
+    <script>
+        let selections = [];
+        const qaData = {
+            '门锁': '请握住门把手，用力上下左右摇晃几下。你会感觉到明显的松动，或者听到金属零件松脱的撞击声吗？',
+            '窗户': '请把头探出窗外看一眼（注意安全）。窗户的上下左右 1 米范围内，是否有空调外机、粗水管或邻居的凸出阳台？',
+            '镜子': '请用手指关节敲击镜子中心。你听到的声音是实心的闷响（像敲墙），还是空心的脆响（像敲玻璃杯）？',
+            '浴室': '请抬头仔细观察一下头顶的排气扇和通风口。透过格栅，你是否能看到内部有不明的黑色圆孔、红点，或者格栅本身有被人为破坏的痕迹吗？'
+        };
+
+        const cozeWebSDK = new CozeWebSDK.WebChatClient({
+            config: { bot_id: '7588350694353649679' },
+            auth: {
+                type: 'token',
+                token: 'cztei_qS0HoZGrmCfjZNVBwzJlBBxFEhKP2boTUWLvZq33v633AN7HxujXE6wUwe6pnIFSO',
+                onRefreshToken: function () { return 'cztei_qS0HoZGrmCfjZNVBwzJlBBxFEhKP2boTUWLvZq33v633AN7HxujXE6wUwe6pnIFSO'; }
+            }
+        });
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const s = document.getElementById('splash-screen');
+                if(s){ s.style.opacity = '0'; setTimeout(() => s.style.display = 'none', 800); }
+            }, 1500);
+        });
+
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function openSelector() { document.getElementById('modal-select').style.display = 'flex'; }
+        
+        function toggleSelect(el, val) {
+            el.classList.toggle('selected');
+            if(el.classList.contains('selected')) { if(!selections.includes(val)) selections.push(val); }
+            else { selections = selections.filter(s => s !== val); }
+        }
+
+        function handleFocus(btn) {
+            const parent = btn.parentElement;
+            parent.querySelectorAll('.qa-btn').forEach(b => b.classList.remove('focused'));
+            btn.classList.add('focused');
+            setTimeout(() => { parent.parentElement.style.opacity = '0.7'; }, 200);
+        }
+
+        function startQA() {
+            if(selections.length === 0) return alert("请选择检测项");
+            document.getElementById('modal-select').style.display = 'none';
+            const container = document.getElementById('qa-render');
+            container.innerHTML = selections.map(s => `
+                <div class="glass-card">
+                    <strong>${s}部位自查：</strong>
+                    <p style="font-size:13px; margin: 10px 0; line-height:1.5;">${qaData[s]}</p>
+                    <div style="display:flex; gap:10px;">
+                        <button class="qa-btn" onclick="handleFocus(this)">是 / 有异常</button>
+                        <button class="qa-btn" onclick="handleFocus(this)">否 / 正常</button>
+                    </div>
+                </div>
+            `).join('');
+            showPage('page-qa');
+        }
+
+        function renderUploads() {
+            const container = document.getElementById('upload-render');
+            container.innerHTML = selections.map((s, i) => `
+                <div class="upload-slot" onclick="document.getElementById('f-${i}').click()" style="cursor:pointer;">
+                    <div style="font-size:14px; color:var(--accent-blue)">点击拍照上传【${s}】实拍图</div>
+                    <input type="file" id="f-${i}" hidden onchange="const img=this.nextElementSibling; img.style.display='block'; img.src=URL.createObjectURL(this.files[0])">
+                    <img style="display:none; width:100%; margin-top:10px; border-radius:8px;">
+                </div>
+            `).join('');
+            showPage('page-upload');
+        }
+
+        function finalProcess() {
+            document.getElementById('scan-screen').style.display = 'flex';
+            setTimeout(() => {
+                window.location.href = "https://www.coze.cn/store/agent/7588350694353649679?bot_id=true&bid=6ijukogrc9g13";
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
