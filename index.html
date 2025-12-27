@@ -11,23 +11,15 @@
     <style>
         :root { --bg-blue: #F0F7FF; --main-blue: #A3C9E2; --accent-blue: #5A9BD5; --text-main: #4A5568; }
         body, html { margin: 0; padding: 0; min-height: 100vh; background: #F5F9FF; font-family: -apple-system, sans-serif; color: var(--text-main); overflow: hidden; }
-        
         .page { display: none; padding: 25px; min-height: 100vh; flex-direction: column; box-sizing: border-box; }
         .page.active { display: flex; }
-
-        /* Main UI */
         .btn-scan-main { width: 160px; height: 160px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--accent-blue); margin: 60px auto; box-shadow: 0 10px 30px rgba(163,201,226,0.4); border: none; cursor: pointer; letter-spacing: 1px; }
-        
         .upload-slot { border: 2px dashed var(--main-blue); padding: 20px; margin-bottom: 15px; text-align: center; border-radius: 15px; background: rgba(255,255,255,0.5); }
-
-        /* Animation */
         #scan-screen { display: none; position: fixed; inset: 0; background: #F0F7FF; z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
         .scan-line { width: 80%; height: 2px; background: var(--accent-blue); position: absolute; box-shadow: 0 0 15px var(--accent-blue); animation: moveScan 2s infinite ease-in-out; }
         @keyframes moveScan { 0% { top: 30%; } 50% { top: 70%; } 100% { top: 30%; } }
-
         .btn-blue { background: var(--accent-blue); color: white; border: none; padding: 18px; width: 100%; border-radius: 15px; font-size: 16px; margin-top: auto; font-weight: 500; }
-        
-        /* Hidden Coze Button */
+        /* 保持 SDK 隐藏，作为后台静默授权使用 */
         .coze-web-sdk-chat-button { display: none !important; }
     </style>
 </head>
@@ -52,28 +44,18 @@
     <div id="scan-screen">
         <div class="scan-line"></div>
         <h3 style="margin-top:50px; color:var(--accent-blue);">HerGuard Engine Active...</h3>
-        <p style="color:#9AB; font-size: 12px;">Analyzing security patterns</p>
     </div>
 
     <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
 
     <script>
-        // Initialize Coze SDK with token
+        // 初始化 SDK 以确保授权 token 有效
         const cozeWebSDK = new CozeWebSDK.WebChatClient({
-            config: {
-                bot_id: '7588350694353649679', //
-            },
-            componentProps: {
-                title: 'CozyShell Agent',
-                initialHeight: 600,
-            },
+            config: { bot_id: '7588350694353649679' },
             auth: {
                 type: 'token',
-                token: 'cztei_qS0HoZGrmCfjZNVBwzJlBBxFEhKP2boTUWLvZq33v633AN7HxujXE6wUwe6pnIFSO', //
-                // FIX: provide onRefreshToken to avoid error
-                onRefreshToken: function () { 
-                    return 'cztei_qS0HoZGrmCfjZNVBwzJlBBxFEhKP2boTUWLvZq33v633AN7HxujXE6wUwe6pnIFSO'; 
-                }
+                token: 'cztei_qS0HoZGrmCfjZNVBwzJlBBxFEhKP2boTUWLvZq33v633AN7HxujXE6wUwe6pnIFSO',
+                onRefreshToken: function () { return 'cztei_qS0HoZGrmCfjZNVBwzJlBBxFEhKP2boTUWLvZq33v633AN7HxujXE6wUwe6pnIFSO'; }
             }
         });
 
@@ -90,19 +72,13 @@
             }
         }
 
+        // 修改跳转至新的商店详情页 URL
         function startAgent() {
             document.getElementById('scan-screen').style.display = 'flex';
             
             setTimeout(function() {
-                document.getElementById('scan-screen').style.display = 'none';
-                // Trigger hidden chat button
-                const chatBtn = document.querySelector('.coze-web-sdk-chat-button');
-                if (chatBtn) {
-                    chatBtn.click();
-                } else {
-                    // Fallback link
-                    window.location.href = "https://www.coze.cn/space/7383534396151693331/bot/7588350694353649679";
-                }
+                // 直接跳转到你指定的新 URL
+                window.location.href = "https://www.coze.cn/store/agent/7588350694353649679?bot_id=true&bid=6ijukogrc9g13";
             }, 2500);
         }
     </script>
