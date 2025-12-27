@@ -2,96 +2,139 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>壳里 Kelly - 随身的守护</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="壳里">
     <link rel="apple-touch-icon" href="https://bubbbbblehu-cell.github.io/safestay/icon.png?v=1">
     <style>
-        :root { --bg-blue: #F0F7FF; --main-blue: #A3C9E2; --accent-blue: #5A9BD5; --glass-white: rgba(255, 255, 255, 0.8); --text-main: #4A5568; }
-        body, html { margin: 0; padding: 0; min-height: 100vh; background: linear-gradient(135deg, #F5F9FF 0%, #EBF4FF 100%); font-family: -apple-system, sans-serif; color: var(--text-main); -webkit-tap-highlight-color: transparent; }
+        :root { 
+            --bg-blue: #F0F7FF; 
+            --main-blue: #A3C9E2; 
+            --accent-blue: #5A9BD5; 
+            --glass-white: rgba(255, 255, 255, 0.8); 
+            --text-main: #4A5568; 
+            --safe-bottom: env(safe-area-inset-bottom);
+        }
         
-        #splash-screen { position: fixed; inset: 0; background: #F0F7FF; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.8s ease; }
+        body, html { 
+            margin: 0; padding: 0; height: 100%; width: 100%;
+            background: linear-gradient(135deg, #F5F9FF 0%, #EBF4FF 100%); 
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
+            color: var(--text-main); 
+            -webkit-tap-highlight-color: transparent;
+            overflow: hidden;
+        }
+
+        /* 页面容器 - 适配长屏 */
+        .page { 
+            display: none; 
+            padding: 20px 25px calc(20px + var(--safe-bottom)); 
+            box-sizing: border-box; 
+            height: 100vh; 
+            flex-direction: column;
+            animation: fadeIn 0.4s ease;
+        }
+        .page.active { display: flex; }
         
-        .page { display: none; padding: 25px; box-sizing: border-box; min-height: 100vh; animation: fadeIn 0.4s ease; }
-        .page.active { display: flex; flex-direction: column; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .glass-card { background: var(--glass-white); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); padding: 20px; margin-bottom: 20px; clip-path: polygon(0 0, 92% 0, 100% 8%, 100% 100%, 0 100%); box-shadow: 10px 10px 20px rgba(163, 201, 226, 0.15); transition: all 0.3s ease; }
-        
-        .btn-scan-main { width: 160px; height: 160px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--accent-blue); margin: 60px auto; box-shadow: 0 15px 35px rgba(163, 201, 226, 0.3); cursor: pointer; }
+        /* 内容滚动区 */
+        .scroll-content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 20px; }
 
-        .option-box { padding: 18px; border: 1px solid rgba(163, 201, 226, 0.3); background: rgba(255,255,255,0.4); margin-bottom: 12px; cursor: pointer; border-radius: 8px; }
+        .glass-card { 
+            background: var(--glass-white); 
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); 
+            border: 1px solid rgba(255,255,255,0.5); 
+            padding: 18px; margin-bottom: 15px; 
+            clip-path: polygon(0 0, 94% 0, 100% 6%, 100% 100%, 0 100%); 
+            box-shadow: 10px 10px 20px rgba(163, 201, 226, 0.15); 
+            transition: all 0.3s ease; 
+        }
+
+        .btn-scan-main { 
+            width: 150px; height: 150px; background: white; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 18px; color: var(--accent-blue); 
+            margin: 40px auto; box-shadow: 0 15px 35px rgba(163, 201, 226, 0.3); 
+            cursor: pointer; border: none;
+        }
+
+        .option-box { padding: 15px; border: 1px solid rgba(163, 201, 226, 0.3); background: rgba(255,255,255,0.4); margin-bottom: 10px; cursor: pointer; border-radius: 12px; }
         .option-box.selected { background: white; border-color: var(--accent-blue); box-shadow: 4px 4px 0 var(--accent-blue); }
-        
-        .qa-btn { flex:1; padding:12px; border:1px solid #DDD; background:white; border-radius: 8px; cursor:pointer; transition: all 0.2s; font-size: 14px; outline: none; }
-        .qa-btn.focused { background: var(--accent-blue) !important; color: white !important; border-color: var(--accent-blue) !important; font-weight: bold; transform: scale(1.05); box-shadow: 0 4px 12px rgba(90, 155, 213, 0.3); }
 
-        .btn-blue { background: var(--accent-blue); color: white; border: none; padding: 18px; width: 100%; font-size: 16px; margin-top: auto; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .qa-btn { flex:1; padding:12px; border:1px solid #DDD; background:white; border-radius: 8px; cursor:pointer; font-size: 14px; }
+        .qa-btn.focused { background: var(--accent-blue) !important; color: white !important; border-color: var(--accent-blue) !important; font-weight: bold; }
 
+        .btn-blue { 
+            background: var(--accent-blue); color: white; border: none; 
+            padding: 16px; width: 100%; font-size: 16px; 
+            border-radius: 12px; cursor: pointer; font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .upload-slot { border: 1.5px dashed var(--main-blue); padding: 15px; margin-bottom: 12px; text-align: center; border-radius: 12px; background: rgba(255,255,255,0.3); }
+        #splash-screen { position: fixed; inset: 0; background: #F0F7FF; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.8s ease; }
         .scan-modal { display: none; position: fixed; inset: 0; background: var(--bg-blue); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
-        .scan-line { width: 250px; height: 2px; background: var(--accent-blue); box-shadow: 0 0 15px var(--accent-blue); position: relative; animation: scan 2s infinite linear; }
-        @keyframes scan { 0%, 100% { top: -80px; } 50% { top: 80px; } }
-        
-        .upload-slot { border: 1.5px dashed var(--main-blue); padding: 20px; margin-bottom: 15px; text-align: center; border-radius: 10px; background: rgba(255,255,255,0.3); }
+        .scan-line { width: 220px; height: 2px; background: var(--accent-blue); box-shadow: 0 0 15px var(--accent-blue); position: relative; animation: scan 2s infinite linear; }
+        @keyframes scan { 0%, 100% { top: -60px; } 50% { top: 60px; } }
         .coze-web-sdk-chat-button { display: none !important; }
     </style>
 </head>
 <body>
     <div id="splash-screen">
-        <div style="width: 80px; height: 80px; background: white; border-radius: 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.05); margin-bottom: 20px;"><span style="font-size: 30px;">🛡️</span></div>
+        <div style="width: 70px; height: 70px; background: white; border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.05); margin-bottom: 15px;"><span style="font-size: 28px;">🛡️</span></div>
         <h2 style="color: #5A9BD5; font-weight: 200; letter-spacing: 4px;">壳里 Kelly</h2>
     </div>
 
     <div id="page-home" class="page active">
-        <h1 style="font-weight: 200; color: var(--accent-blue); letter-spacing: 5px; margin-top: 50px; text-align: center;">壳里 Kelly</h1>
-        <div class="btn-scan-main" onclick="openSelector()">开启守护</div>
-        <div class="glass-card" style="width: 100%; text-align: left; margin-top: auto; box-sizing: border-box;">
+        <div class="scroll-content">
+            <h1 style="font-weight: 200; color: var(--accent-blue); letter-spacing: 5px; margin-top: 40px; text-align: center;">壳里 Kelly</h1>
+            <div class="btn-scan-main" onclick="openSelector()">开启守护</div>
+        </div>
+        <div class="glass-card" style="margin-bottom: 0;">
             <strong>女性互助社群</strong>
             <p style="font-size: 11px; color: #9AB; margin-top: 5px;">查看 5,000+ 真实入住风险预警</p>
         </div>
     </div>
 
-    <div id="modal-select" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.1); backdrop-filter:blur(5px); z-index:500; align-items:flex-end;">
-        <div style="background:white; width:100%; padding:30px 20px; border-radius:24px 24px 0 0; box-sizing:border-box;">
-            <h3 style="margin-top:0">请选择检测部位</h3>
-            <div id="check-list">
-                <div class="option-box" onclick="toggleSelect(this, '门锁')">门锁安全检查</div>
-                <div class="option-box" onclick="toggleSelect(this, '窗户')">窗户外部检查</div>
-                <div class="option-box" onclick="toggleSelect(this, '镜子')">双面镜检测</div>
-                <div class="option-box" onclick="toggleSelect(this, '浴室')">浴室通风口检查</div>
-            </div>
+    <div id="modal-select" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.2); backdrop-filter:blur(5px); z-index:500; align-items:flex-end;">
+        <div style="background:white; width:100%; padding:25px 20px calc(25px + var(--safe-bottom)); border-radius:24px 24px 0 0; box-sizing:border-box;">
+            <h3 style="margin-top:0; font-weight: 400;">请选择检测部位</h3>
+            <div class="option-box" onclick="toggleSelect(this, '门锁')">门锁安全检查</div>
+            <div class="option-box" onclick="toggleSelect(this, '窗户')">窗户外部检查</div>
+            <div class="option-box" onclick="toggleSelect(this, '镜子')">双面镜检测</div>
+            <div class="option-box" onclick="toggleSelect(this, '浴室')">浴室通风口检查</div>
             <button class="btn-blue" onclick="startQA()">确认并开始</button>
         </div>
     </div>
 
     <div id="page-qa" class="page">
-        <h2 style="font-weight: 300;">安全自查引导</h2>
-        <div id="qa-render"></div>
+        <h2 style="font-weight: 300; margin-top: 10px;">安全自查引导</h2>
+        <div id="qa-render" class="scroll-content"></div>
         <button class="btn-blue" onclick="renderUploads()">完成自查并去上传</button>
     </div>
 
     <div id="page-upload" class="page">
-        <h2 style="font-weight: 300;">影像取证上传</h2>
-        <div id="upload-render"></div>
+        <h2 style="font-weight: 300; margin-top: 10px;">影像取证上传</h2>
+        <div id="upload-render" class="scroll-content"></div>
         <button class="btn-blue" onclick="finalProcess()">提交 AI 专家深度分析</button>
     </div>
 
     <div id="scan-screen" class="scan-modal">
         <div class="scan-line"></div>
-        <h3 style="margin-top:40px; color:var(--accent-blue); font-weight:200;">HerGuard 引擎正在介入...</h3>
+        <h3 style="margin-top:40px; color:var(--accent-blue); font-weight:200;">HerGuard 引擎正在接入...</h3>
     </div>
 
     <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
-
     <script>
         let selections = [];
         const qaData = {
             '门锁': '请握住门把手，用力上下左右摇晃几下。你会感觉到明显的松动，或者听到金属零件松脱的撞击声吗？',
-            '窗户': '请把头探出窗外看一眼（注意安全）。窗户的上下左右 1 米范围内，是否有空调外机、粗水管或邻居的凸出阳台？',
-            '镜子': '请用手指关节敲击镜子中心。你听到的声音是实心的闷响（像敲墙），还是空心的脆响（像敲玻璃杯）？',
-            '浴室': '请抬头仔细观察一下头顶的排气扇和通风口。透过格栅，你是否能看到内部有不明的黑色圆孔、红点，或者格栅本身有被人为破坏的痕迹吗？'
+            '窗户': '请把头探出窗外看一眼。窗户的 1 米范围内，是否有空调外机、粗水管或邻居的凸出阳台？',
+            '镜子': '请用手指关节敲击镜子中心。你听到的声音是实心的闷响（像敲墙），还是空心的脆响？',
+            '浴室': '请抬头观察排气扇。透过格栅，你是否能看到内部有不明的黑色圆孔、红点或破坏痕迹？'
         };
 
         const cozeWebSDK = new CozeWebSDK.WebChatClient({
@@ -107,13 +150,8 @@
             setTimeout(() => {
                 const s = document.getElementById('splash-screen');
                 if(s){ s.style.opacity = '0'; setTimeout(() => s.style.display = 'none', 800); }
-            }, 1500);
+            }, 1200);
         });
-
-        function showPage(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
 
         function openSelector() { document.getElementById('modal-select').style.display = 'flex'; }
         
@@ -124,10 +162,9 @@
         }
 
         function handleFocus(btn) {
-            const parent = btn.parentElement;
-            parent.querySelectorAll('.qa-btn').forEach(b => b.classList.remove('focused'));
+            btn.parentElement.querySelectorAll('.qa-btn').forEach(b => b.classList.remove('focused'));
             btn.classList.add('focused');
-            setTimeout(() => { parent.parentElement.style.opacity = '0.7'; }, 200);
+            setTimeout(() => { btn.parentElement.parentElement.style.opacity = '0.7'; }, 200);
         }
 
         function startQA() {
@@ -137,26 +174,28 @@
             container.innerHTML = selections.map(s => `
                 <div class="glass-card">
                     <strong>${s}部位自查：</strong>
-                    <p style="font-size:13px; margin: 10px 0; line-height:1.5;">${qaData[s]}</p>
+                    <p style="font-size:13px; margin: 8px 0; line-height:1.4;">${qaData[s]}</p>
                     <div style="display:flex; gap:10px;">
                         <button class="qa-btn" onclick="handleFocus(this)">是 / 有异常</button>
                         <button class="qa-btn" onclick="handleFocus(this)">否 / 正常</button>
                     </div>
                 </div>
             `).join('');
-            showPage('page-qa');
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-qa').classList.add('active');
         }
 
         function renderUploads() {
             const container = document.getElementById('upload-render');
             container.innerHTML = selections.map((s, i) => `
-                <div class="upload-slot" onclick="document.getElementById('f-${i}').click()" style="cursor:pointer;">
-                    <div style="font-size:14px; color:var(--accent-blue)">点击拍照上传【${s}】实拍图</div>
+                <div class="upload-slot" onclick="document.getElementById('f-${i}').click()">
+                    <div style="font-size:13px; color:var(--accent-blue)">点击拍摄上传【${s}】实拍图</div>
                     <input type="file" id="f-${i}" hidden onchange="const img=this.nextElementSibling; img.style.display='block'; img.src=URL.createObjectURL(this.files[0])">
-                    <img style="display:none; width:100%; margin-top:10px; border-radius:8px;">
+                    <img style="display:none; width:100%; margin-top:8px; border-radius:8px;">
                 </div>
             `).join('');
-            showPage('page-upload');
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-upload').classList.add('active');
         }
 
         function finalProcess() {
