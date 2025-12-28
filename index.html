@@ -12,9 +12,12 @@
     <title>壳里 Kelly - 随身的守护</title>
     <style>
         :root { 
-            --bg-blue: #F0F7FF; --main-blue: #A3C9E2; --accent-blue: #5A9BD5; 
-            --glass-white: rgba(255, 255, 255, 0.85); --text-main: #4A5568; 
-            --risk-bg: #FFF5F5; --risk-text: #E53E3E; --safe-bottom: env(safe-area-inset-bottom);
+        --bg-blue: #F0F7FF; --main-blue: #A3C9E2; --accent-blue: #5A9BD5; 
+    --glass-white: rgba(255, 255, 255, 0.85); --text-main: #4A5568; 
+    --risk-bg: #FFF5F5; --risk-text: #E53E3E; 
+    --safe-bottom: env(safe-area-inset-bottom);
+    /* 新增：强制顶部留出更多空间，防止被时间/信号遮挡 */
+    --safe-top: max(44px, env(safe-area-inset-top));
         }
         
 body, html { 
@@ -26,7 +29,15 @@ margin: 0; padding: 0;
     position: fixed; /* 锁定位置防止滚动露出黑底 */
 }
 
-        .page { display: none; padding: 20px; box-sizing: border-box; min-height: 100vh; flex-direction: column; animation: fadeIn 0.3s ease; }
+        .page { 
+            display: none; 
+    /* 将 padding-top 改为使用变量 */
+    padding: var(--safe-top) 20px 20px 20px; 
+    box-sizing: border-box; 
+    min-height: 100vh; 
+    flex-direction: column; 
+    animation: fadeIn 0.3s ease;
+        }
         .page.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
@@ -86,7 +97,7 @@ background: rgba(255, 255, 255, 0.7); /* 提高透明度 */
 
 <div id="page-home" class="page active">
     <div class="scroll-content" style="text-align: center;">
-        <img src="icon.png" class="app-logo" style="margin-top: 120px;">
+        <img src="icon.png" class="app-logo" style="margin-top: 180px;">
         <h1 style="font-weight: 200; color: var(--accent-blue); letter-spacing: 5px; margin-bottom: 30px;">壳里 Kelly</h1>
         <button class="btn-scan-main" onclick="openSelector()">开启守护</button>
     </div>
@@ -216,6 +227,7 @@ background: rgba(255, 255, 255, 0.7); /* 提高透明度 */
     </script>
 </body>
 </html>
+
 
 
 
