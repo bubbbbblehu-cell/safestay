@@ -36,10 +36,14 @@ margin: 0; padding: 0;
         .app-logo { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(163,201,226,0.3); }
 
         .glass-card { 
-            background: var(--glass-white); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.5); padding: 18px; margin-bottom: 15px; 
-            clip-path: polygon(0 0, 92% 0, 100% 8%, 100% 100%, 0 100%); 
-            box-shadow: 0 8px 32px rgba(163, 201, 226, 0.15); 
+background: rgba(255, 255, 255, 0.7); /* 提高透明度 */
+    backdrop-filter: blur(15px); 
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255,255,255,0.4); 
+    padding: 20px; 
+    margin-bottom: 15px; 
+    border-radius: 24px; /* 改为圆角，比之前的多边形更柔和 */
+    box-shadow: 0 10px 30px rgba(163, 201, 226, 0.2);
         }
 
         /* 风险点样式 - 确保非常醒目 */
@@ -80,20 +84,20 @@ margin: 0; padding: 0;
     <img src="splash.png" style="width:100%; height:100%; object-fit: cover; object-position: center;">
 </div>
 
-    <div id="page-home" class="page active">
-        <div class="scroll-content" style="text-align: center;">
-            <img src="icon.png" class="app-logo" style="margin-top: 60px;">
-            <h1 style="font-weight: 200; color: var(--accent-blue); letter-spacing: 5px;">壳里 Kelly</h1>
-            <button class="btn-scan-main" onclick="openSelector()">开启守护</button>
-        </div>
-        <div class="fixed-bottom-bar" style="background:none; box-shadow:none; position:relative;">
-            <div class="glass-card" style="margin-bottom:0;">
-                <strong>女性互助社群</strong>
-                <p style="font-size: 11px; color: #9AB; margin-top: 5px;">已为 5,000+ 用户提供安全预警</p>
-            </div>
+<div id="page-home" class="page active">
+    <div class="scroll-content" style="text-align: center;">
+        <img src="icon.png" class="app-logo" style="margin-top: 120px;">
+        <h1 style="font-weight: 200; color: var(--accent-blue); letter-spacing: 5px; margin-bottom: 30px;">壳里 Kelly</h1>
+        <button class="btn-scan-main" onclick="openSelector()">开启守护</button>
+    </div>
+    
+    <div class="fixed-bottom-bar" style="background:none; box-shadow:none; padding-bottom: calc(30px + var(--safe-bottom));">
+        <div class="glass-card" style="margin: 0 10px; border-radius: 20px; clip-path: none;">
+            <strong style="color: var(--accent-blue);">女性互助社群</strong>
+            <p style="font-size: 11px; color: #9AB; margin-top: 5px;">已为 5,000+ 用户提供安全预警</p>
         </div>
     </div>
-
+</div>
     <div id="modal-select" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); backdrop-filter:blur(8px); z-index:2000; align-items:flex-end;">
         <div style="background:white; width:100%; padding:30px 20px calc(20px + var(--safe-bottom)); border-radius:28px 28px 0 0; box-sizing:border-box; max-height:80vh; overflow-y:auto;">
             <h3 style="margin:0 0 20px 0; font-weight:400; text-align:center;">请选择检测部位</h3>
@@ -212,6 +216,7 @@ margin: 0; padding: 0;
     </script>
 </body>
 </html>
+
 
 
 
