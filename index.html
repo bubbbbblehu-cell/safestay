@@ -6,7 +6,7 @@
     
     <link rel="apple-touch-icon" href="icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="壳里 Kelly">
 
     <title>壳里 Kelly - 随身的守护</title>
@@ -18,10 +18,12 @@
         }
         
 body, html { 
-    margin: 0; padding: 0; height: 100%; width: 100%;
-    background: linear-gradient(135deg, #F5F9FF 0%, #EBF4FF 100%); 
+margin: 0; padding: 0; 
+    height: 100vh; width: 100vw;
+    background: #FFFFFF; /* 强制背景为白，防止黑色闪现 */
     font-family: -apple-system, sans-serif; 
-    overflow: hidden; /* 初始锁定，开屏结束后由JS开启 */
+    overflow: hidden;
+    position: fixed; /* 锁定位置防止滚动露出黑底 */
 }
 
         .page { display: none; padding: 20px; box-sizing: border-box; min-height: 100vh; flex-direction: column; animation: fadeIn 0.3s ease; }
@@ -74,9 +76,8 @@ body, html {
     </style>
 </head>
 <body>
-
-    <div id="splash-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; display:flex; transition:opacity 0.8s ease; overflow:hidden;">
-    <img src="splash.png" style="width:100%; height:100%; object-fit: cover; object-position: center top;">
+<div id="splash-screen" style="position:fixed; top:-5px; left:0; width:100%; height:calc(100% + 10px); background:white; z-index:9999; display:flex; transition:opacity 0.8s ease; overflow:hidden;">
+    <img src="splash.png" style="width:100%; height:100%; object-fit: cover; object-position: center;">
 </div>
 
     <div id="page-home" class="page active">
@@ -211,5 +212,6 @@ body, html {
     </script>
 </body>
 </html>
+
 
 
