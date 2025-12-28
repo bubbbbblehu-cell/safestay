@@ -17,11 +17,12 @@
             --risk-bg: #FFF5F5; --risk-text: #E53E3E; --safe-bottom: env(safe-area-inset-bottom);
         }
         
-        body, html { 
-            margin: 0; padding: 0; height: 100%; width: 100%;
-            background: linear-gradient(135deg, #F5F9FF 0%, #EBF4FF 100%); 
-            font-family: -apple-system, sans-serif; overflow-x: hidden;
-        }
+body, html { 
+    margin: 0; padding: 0; height: 100%; width: 100%;
+    background: linear-gradient(135deg, #F5F9FF 0%, #EBF4FF 100%); 
+    font-family: -apple-system, sans-serif; 
+    overflow: hidden; /* 初始锁定，开屏结束后由JS开启 */
+}
 
         .page { display: none; padding: 20px; box-sizing: border-box; min-height: 100vh; flex-direction: column; animation: fadeIn 0.3s ease; }
         .page.active { display: flex; }
@@ -74,6 +75,10 @@
 </head>
 <body>
 
+    <div id="splash-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; display:flex; transition:opacity 0.8s ease;">
+        <img src="splash.png" style="width:100%; height:100%; object-fit:cover;">
+    </div>
+
     <div id="page-home" class="page active">
         <div class="scroll-content" style="text-align: center;">
             <img src="icon.png" class="app-logo" style="margin-top: 60px;">
@@ -117,6 +122,18 @@
     </div>
 
     <script>
+        window.addEventListener('load', () => {
+        setTimeout(() => {
+            const splash = document.getElementById('splash-screen');
+            if(splash) {
+                splash.style.opacity = '0';
+                setTimeout(() => { 
+                    splash.remove(); 
+                    document.body.style.overflow = 'auto'; // 恢复页面滚动
+                }, 800);
+            }
+        }, 2500); // 2.5秒后开始消失
+    });
         let selections = [];
         const qaData = {
             '门锁': { q: '握住门把手摇晃，是否感觉到明显松动或听到零件撞击声？', r: '门锁松动极可能是被撬动的痕迹，或内部反锁机构已失效。' },
@@ -194,3 +211,4 @@
     </script>
 </body>
 </html>
+
